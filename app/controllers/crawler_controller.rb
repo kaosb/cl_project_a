@@ -16,7 +16,7 @@ class CrawlerController < ApplicationController
 		result = Array.new
 		error_obj = Array.new
 		a = Mechanize.new
-		# a.set_proxy('127.0.0.1', '8118')
+		a.set_proxy('127.0.0.1', 8118)
 		a.get('http://www2.chileautos.cl/chileautos.asp') do |page|
 			search_result = page.form_with(:name => 'form_vehiculos') do |form|
 				model_field = form.field_with(:name => 'modelo')
