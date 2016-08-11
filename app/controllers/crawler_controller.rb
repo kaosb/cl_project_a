@@ -34,7 +34,8 @@ class CrawlerController < ApplicationController
 			body.css('.tbl_Principal').css('tr').each do |tr|
 				begin
 					url = 'http:' + tr.css('td')[1].css('a')[0]['href']
-					detail = Nokogiri::HTML(open(url, :proxy => "http://127.0.0.1:8050"))
+					detail = Nokogiri::HTML(open(url))
+					# detail = Nokogiri::HTML(open(url, :proxy => "http://127.0.0.1:8050"))
 					published = detail.css('body > div:nth-child(6) > div:nth-child(2) > div:nth-child(2) > div:nth-child(1) > div:nth-child(2)')[0].text.squish
 					viewed = detail.css('.visitas-auto')[0].text.squish
 					element = {
@@ -55,11 +56,12 @@ class CrawlerController < ApplicationController
 			end
 			## Reviso las otras paginas
 			body.css('.nav').each do |link|
-				document = Nokogiri::HTML(open('http:'+link['href'], :proxy => "http://127.0.0.1:8050"))
+				document = Nokogiri::HTML(open('http:' + link['href']))
+				# document = Nokogiri::HTML(open('http:'+link['href'], :proxy => "http://127.0.0.1:8050"))
 				document.css('.tbl_Principal').css('tr').each do |tr|
 					begin
 						url = 'http:' + tr.css('td')[1].css('a')[0]['href']
-						detail = Nokogiri::HTML(open(url, :proxy => "http://127.0.0.1:8050"))
+						detail = Nokogiri::HTML(open(url))
 						# detail = Nokogiri::HTML(open(url, :proxy => "http://127.0.0.1:8050"))
 						published = detail.css('body > div:nth-child(6) > div:nth-child(2) > div:nth-child(2) > div:nth-child(1) > div:nth-child(2)')[0].text.squish
 						viewed = detail.css('.visitas-auto')[0].text.squish
