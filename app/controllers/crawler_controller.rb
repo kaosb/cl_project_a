@@ -16,7 +16,7 @@ class CrawlerController < ApplicationController
 		result = Array.new
 		error_obj = Array.new
 		a = Mechanize.new
-		# a.set_proxy('127.0.0.1', '8050')
+		a.set_proxy('127.0.0.1', '8118')
 		a.get('http://www2.chileautos.cl/chileautos.asp') do |page|
 			search_result = page.form_with(:name => 'form_vehiculos') do |form|
 				model_field = form.field_with(:name => 'modelo')
@@ -35,7 +35,7 @@ class CrawlerController < ApplicationController
 				begin
 					url = 'http:' + tr.css('td')[1].css('a')[0]['href']
 					# detail = Nokogiri::HTML(open(url))
-					detail = Nokogiri::HTML(open(url, :proxy => URI.parse("http://127.0.0.1:8050")))
+					detail = Nokogiri::HTML(open(url, :proxy => URI.parse("http://127.0.0.1:8118")))
 					published = detail.css('body > div:nth-child(6) > div:nth-child(2) > div:nth-child(2) > div:nth-child(1) > div:nth-child(2)')[0].text.squish
 					viewed = detail.css('.visitas-auto')[0].text.squish
 					element = {
@@ -58,12 +58,12 @@ class CrawlerController < ApplicationController
 			body.css('.nav').each do |link|
 				url = 'http:' + link['href']
 				# document = Nokogiri::HTML(open(url))
-				document = Nokogiri::HTML(open(url, :proxy => URI.parse("http://127.0.0.1:8050")))
+				document = Nokogiri::HTML(open(url, :proxy => URI.parse("http://127.0.0.1:8118")))
 				document.css('.tbl_Principal').css('tr').each do |tr|
 					begin
 						url = 'http:' + tr.css('td')[1].css('a')[0]['href']
 						# detail = Nokogiri::HTML(open(url))
-						detail = Nokogiri::HTML(open(url, :proxy => URI.parse("http://127.0.0.1:8050")))
+						detail = Nokogiri::HTML(open(url, :proxy => URI.parse("http://127.0.0.1:8118")))
 						published = detail.css('body > div:nth-child(6) > div:nth-child(2) > div:nth-child(2) > div:nth-child(1) > div:nth-child(2)')[0].text.squish
 						viewed = detail.css('.visitas-auto')[0].text.squish
 						element = {
