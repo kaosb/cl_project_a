@@ -8,6 +8,7 @@ Rails.application.routes.draw do
 			scope '/crawler' do
 				get '/chileautos' => 'crawler#chileautos'
 				get '/chileautos/:search' => 'crawler#chileautos'
+				get '/proxychileautos' => 'crawler#proxychileautos'
 			end
 		end
 	end

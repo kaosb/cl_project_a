@@ -90,4 +90,38 @@ class CrawlerController < ApplicationController
 			render :json => { :status => true, :message => "There was a problem retrieving the information." }, :status => 200
 		end
 	end
+
+	def proxychileautos
+		require 'mechanize'
+		require 'nokogiri'
+		require 'open-uri'
+		if params[:search].nil?
+			search = "cerato"
+		else
+			search = params[:search].to_s
+		end
+		result = Array.new
+		error_obj = Array.new
+		a = Mechanize.new
+		a.set_proxy('127.0.0.1', 8118)
+		a.get('http://www2.chileautos.cl/chileautos.asp') do |page|
+			search_result = page.form_with(:name => 'form_vehiculos') do |form|
+				model_field = form.field_with(:name => 'modelo')
+				model_field.value = search
+				ai_field = form.field_with(:name => 'ai')
+				ai_field.value = 2012
+				af_field = form.field_with(:name => 'af')
+				af_field.value = 2016
+				dea_field = form.field_with(:name => 'dea')
+				dea_field.value = 100
+				button = form.button
+			end.submit
+		end
+		body = Nokogiri::HTML(search_result.body)
+		if body.any?
+			render :json => { :status => true, :message => "Results.", :body => body }, :status => 200
+		else
+			render :json => { :status => true, :message => "There was a problem retrieving the information." }, :status => 200
+		end
+	end
 end
