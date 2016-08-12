@@ -8,16 +8,16 @@ class CrawlerController < ApplicationController
 		require 'mechanize'
 		require 'nokogiri'
 		require 'open-uri'
-		if params[:search].nil?
-			search = "cerato"
-		else
-			search = params[:search].to_s
-		end
+		# Verifico Parametros.
+		search = params[:search].nil? ? 'cerato' : params[:search].to_s
+		# Declaro los array que almacenaran el resultado.
 		result = Array.new
 		error_obj = Array.new
+		# Inicializo Mechanize que se encargara de consumir el formulario de busqueda.
 		a = Mechanize.new
 		a.set_proxy('127.0.0.1', 8118)
 		a.get('http://www2.chileautos.cl/chileautos.asp') do |page|
+			# Seteo el formulario y lo ejecuto.
 			search_result = page.form_with(:name => 'form_vehiculos') do |form|
 				model_field = form.field_with(:name => 'modelo')
 				model_field.value = search
@@ -29,35 +29,11 @@ class CrawlerController < ApplicationController
 				dea_field.value = 100
 				button = form.button
 			end.submit
-			# Parseo y muestro
+			# Obtenemos el DOM, y lo parceamos.
 			body = Nokogiri::HTML(search_result.body)
-			body.css('.tbl_Principal').css('tr').each do |tr|
-				begin
-					url = 'http:' + tr.css('td')[1].css('a')[0]['href']
-					detail = Nokogiri::HTML(open(url, :proxy => "http://127.0.0.1:8118"))
-					published = detail.css('body > div:nth-child(6) > div:nth-child(2) > div:nth-child(2) > div:nth-child(1) > div:nth-child(2)')[0].text.squish
-					viewed = detail.css('.visitas-auto')[0].text.squish
-					element = {
-						image: tr.css('td')[0].css('img')[0]['src'],
-						link: 'http:' + tr.css('td')[1].css('a')[0]['href'],
-						brand_model: tr.css('td')[1].css('a')[0].text.squish,
-						year: tr.css('td')[2].text.squish.to_i,
-						price: tr.css('td')[3].text.squish.gsub('$','').gsub('.','').gsub(' ','').to_i,
-						seller: tr.css('td')[4].text.squish,
-						published: published.gsub('Publicado ',''),
-						viewed: viewed.to_i
-					}
-					result << element
-				rescue StandardError => e
-					# error_obj << tr
-					puts "Parse error #{e.message}"
-				end
-			end
-			## Reviso las otras paginas
-			body.css('.nav').each do |link|
-				url = 'http:' + link['href']
-				document = Nokogiri::HTML(open(url, :proxy => "http://127.0.0.1:8118"))
-				document.css('.tbl_Principal').css('tr').each do |tr|
+			# Obtenemos la tabla de resultados y la iteramos.
+			body.css('.tbl_Principal').css('tr').each do |index, tr|
+				if index > 0
 					begin
 						url = 'http:' + tr.css('td')[1].css('a')[0]['href']
 						detail = Nokogiri::HTML(open(url, :proxy => "http://127.0.0.1:8118"))
@@ -77,6 +53,35 @@ class CrawlerController < ApplicationController
 					rescue StandardError => e
 						# error_obj << tr
 						puts "Parse error #{e.message}"
+					end
+				end
+			end
+			## Reviso las otras paginas
+			body.css('.nav').each do |link|
+				url = 'http:' + link['href']
+				document = Nokogiri::HTML(open(url, :proxy => "http://127.0.0.1:8118"))
+				document.css('.tbl_Principal').css('tr').each do |index, tr|
+					if index > 0
+						begin
+							url = 'http:' + tr.css('td')[1].css('a')[0]['href']
+							detail = Nokogiri::HTML(open(url, :proxy => "http://127.0.0.1:8118"))
+							published = detail.css('body > div:nth-child(6) > div:nth-child(2) > div:nth-child(2) > div:nth-child(1) > div:nth-child(2)')[0].text.squish
+							viewed = detail.css('.visitas-auto')[0].text.squish
+							element = {
+								image: tr.css('td')[0].css('img')[0]['src'],
+								link: 'http:' + tr.css('td')[1].css('a')[0]['href'],
+								brand_model: tr.css('td')[1].css('a')[0].text.squish,
+								year: tr.css('td')[2].text.squish.to_i,
+								price: tr.css('td')[3].text.squish.gsub('$','').gsub('.','').gsub(' ','').to_i,
+								seller: tr.css('td')[4].text.squish,
+								published: published.gsub('Publicado ',''),
+								viewed: viewed.to_i
+							}
+							result << element
+						rescue StandardError => e
+							# error_obj << tr
+							puts "Parse error #{e.message}"
+						end
 					end
 				end
 			end
