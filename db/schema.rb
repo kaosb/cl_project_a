@@ -52,10 +52,4 @@ ActiveRecord::Schema.define(version: 20160814055938) do
     t.boolean  "status",      default: true
   end
 
-  create_table "sqlite_stat1", id: false, force: :cascade do |t|
-    t. "tbl"
-    t. "idx"
-    t. "stat"
-  end
-
 end
