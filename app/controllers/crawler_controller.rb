@@ -16,7 +16,6 @@ class CrawlerController < ApplicationController
 	end
 
 	def chileautos_crawler(search)
-		require 'mechanize'
 		require 'nokogiri'
 		# Declaro los array que almacenaran el resultado.
 		result = Array.new
