@@ -15,15 +15,4 @@ class CrawlerController < ApplicationController
 		end
 	end
 
-	def chileautos_persistent
-		# Verifico Parametros.
-		search = params[:search].nil? ? 'cerato' : params[:search].to_s
-		result = Car.where("titulo LIKE ?", "%#{search}%")
-		if result.any?
-			render :json => { :status => true, :message => "Search persistent results.", :result => result }, :status => 200
-		else
-			render :json => { :status => true, :message => "No results." }, :status => 200
-		end
-	end
-
 end
