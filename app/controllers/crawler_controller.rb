@@ -4,20 +4,16 @@ class CrawlerController < ApplicationController
 		render :json => { :status => true, :message => "Project A." }, :status => 200
 	end
 
-	def switch_endpoint
-		require 'net/telnet'
-		localhost = Net::Telnet::new("Host" => "127.0.0.1", "Port" => "8051", "Timeout" => 10, "Prompt" => /250 OK\n/)
-		localhost.cmd('AUTHENTICATE "zz359G*wNDHxnT8#GwPmFHs@4"') { |c| print c; throw "Cannot authenticate to Tor" if c != "250 OK\n" }
-		localhost.cmd('signal NEWNYM') { |c| print c; throw "Cannot switch Tor to new route" if c != "250 OK\n" }
-		localhost.close
+	def chileautos
+		# Verifico Parametros.
+		search = params[:search].nil? ? 'cerato' : params[:search].to_s
+		chileautos_crawler(search)
 	end
 
-	def chileautos
+	def chileautos_crawler(search)
 		require 'mechanize'
 		require 'nokogiri'
 		require 'open-uri'
-		# Verifico Parametros.
-		search = params[:search].nil? ? 'cerato' : params[:search].to_s
 		# Declaro los array que almacenaran el resultado.
 		result = Array.new
 		# Inicializo Mechanize que se encargara de consumir el formulario de busqueda.
@@ -42,29 +38,21 @@ class CrawlerController < ApplicationController
 			# Obtenemos la tabla de resultados y la iteramos.
 			body.css('.tbl_Principal').css('tr')[1..-1].each do |tr|
 				begin
-					# Proceso el resultado por row.
-					image = tr.css('td')[0].css('img')[0]['src'] ? tr.css('td')[0].css('img')[0]['src'] : nil
 					link = 'http:' + (tr.css('td')[1].css('a')[0]['href'] ? tr.css('td')[1].css('a')[0]['href'] : nil)
-					brand_model = tr.css('td')[1].css('a')[0].text.squish ? tr.css('td')[1].css('a')[0].text.squish : nil
-					year = tr.css('td')[2].text.squish.to_i ? tr.css('td')[2].text.squish.to_i : nil
-					price = tr.css('td')[3].text ? tr.css('td')[3].text.squish.to_s.gsub('$','').gsub('.','').gsub(' ','').to_s.to_i : nil
-					seller = tr.css('td')[4].text.squish ? tr.css('td')[4].text.squish : nil
-					# Obtengo el detalle de cada row.
-					detail = Nokogiri::HTML(open('http:' + tr.css('td')[1].css('a')[0]['href'], :proxy => "http://127.0.0.1:8118"))
-					xpath = 'body > div:nth-child(6) > div:nth-child(2) > div:nth-child(2) > div:nth-child(1) > div:nth-child(2)'
-					published = detail.css(xpath)[0] ? detail.css(xpath)[0].text.squish.gsub('Publicado ','').gsub('.','') : nil
-					viewed = detail.css('.visitas-auto')[0] ? detail.css('.visitas-auto')[0].text.squish.to_i : nil
+					site_id = link.gsub('http://www2.chileautos.cl/auto.asp?codauto=','').to_i
 					element = {
-						image: image,
+						site_id: site_id,
+						imagen: tr.css('td')[0].css('img')[0]['src'] ? tr.css('td')[0].css('img')[0]['src'] : nil,
 						link: link,
-						brand_model: brand_model,
-						year: year,
-						price: price,
-						seller: seller,
-						published: published,
-						viewed: viewed
+						titulo: tr.css('td')[1].css('a')[0].text.squish ? tr.css('td')[1].css('a')[0].text.squish : nil,
+						ano: tr.css('td')[2].text.squish.to_i ? tr.css('td')[2].text.squish.to_i : nil,
+						precio: tr.css('td')[3].text ? tr.css('td')[3].text.squish.to_s.gsub('$','').gsub('.','').gsub(' ','').to_s.to_i : nil,
+						vendedor: tr.css('td')[4].text.squish ? tr.css('td')[4].text.squish : nil
 					}
-					result << element
+					# Obtengo el detalle de cada row.
+					url = 'http:' + tr.css('td')[1].css('a')[0]['href']
+					# Agrego el objeto hash al array que los agrupa.
+					result << chileautos_detail_scraper(url, element)
 				rescue StandardError => e
 					puts "Parse error #{e.message}"
 					puts " - - - -"
@@ -79,29 +67,21 @@ class CrawlerController < ApplicationController
 				document = Nokogiri::HTML(open(url, :proxy => "http://127.0.0.1:8118"))
 				document.css('.tbl_Principal').css('tr')[1..-1].each do |tr|
 					begin
-						# Proceso el resultado por row.
-						image = tr.css('td')[0].css('img')[0]['src'] ? tr.css('td')[0].css('img')[0]['src'] : nil
 						link = 'http:' + (tr.css('td')[1].css('a')[0]['href'] ? tr.css('td')[1].css('a')[0]['href'] : nil)
-						brand_model = tr.css('td')[1].css('a')[0].text.squish ? tr.css('td')[1].css('a')[0].text.squish : nil
-						year = tr.css('td')[2].text.squish.to_i ? tr.css('td')[2].text.squish.to_i : nil
-						price = tr.css('td')[3].text ? tr.css('td')[3].text.squish.to_s.gsub('$','').gsub('.','').gsub(' ','').to_s.to_i : nil
-						seller = tr.css('td')[4].text.squish ? tr.css('td')[4].text.squish : nil
-						# Obtengo el detalle de cada row.
-						detail = Nokogiri::HTML(open('http:' + tr.css('td')[1].css('a')[0]['href'], :proxy => "http://127.0.0.1:8118"))
-						xpath = 'body > div:nth-child(6) > div:nth-child(2) > div:nth-child(2) > div:nth-child(1) > div:nth-child(2)'
-						published = detail.css(xpath)[0] ? detail.css(xpath)[0].text.squish.gsub('Publicado ','').gsub('.','') : nil
-						viewed = detail.css('.visitas-auto')[0] ? detail.css('.visitas-auto')[0].text.squish.to_i : nil
+						site_id = link.gsub('http://www2.chileautos.cl/auto.asp?codauto=','').to_i
 						element = {
-							image: image,
+							site_id: site_id,
+							imagen: tr.css('td')[0].css('img')[0]['src'] ? tr.css('td')[0].css('img')[0]['src'] : nil,
 							link: link,
-							brand_model: brand_model,
-							year: year,
-							price: price,
-							seller: seller,
-							published: published,
-							viewed: viewed
+							titulo: tr.css('td')[1].css('a')[0].text.squish ? tr.css('td')[1].css('a')[0].text.squish : nil,
+							ano: tr.css('td')[2].text.squish.to_i ? tr.css('td')[2].text.squish.to_i : nil,
+							precio: tr.css('td')[3].text ? tr.css('td')[3].text.squish.to_s.gsub('$','').gsub('.','').gsub(' ','').to_s.to_i : nil,
+							vendedor: tr.css('td')[4].text.squish ? tr.css('td')[4].text.squish : nil
 						}
-						result << element
+						# Obtengo el detalle de cada row.
+						url = 'http:' + tr.css('td')[1].css('a')[0]['href']
+						# Agrego el objeto hash al array que los agrupa.
+						result << chileautos_detail_scraper(url, element)
 					rescue StandardError => e
 						puts "Parse error #{e.message}"
 						puts " - - - -"
@@ -119,37 +99,72 @@ class CrawlerController < ApplicationController
 		end
 	end
 
-	def proxychileautos
-		require 'mechanize'
-		require 'nokogiri'
-		require 'open-uri'
-		if params[:search].nil?
-			search = "cerato"
-		else
-			search = params[:search].to_s
+	def chileautos_detail_scraper(url, element)
+		detail = Nokogiri::HTML(open(url, :proxy => "http://127.0.0.1:8118"))
+		# Obtengo datos del dom y inicializo el objeto con la informacion preliminar.
+		publicado_selector = 'body > div:nth-child(6) > div:nth-child(2) > div:nth-child(2) > div:nth-child(1) > div:nth-child(2)'
+		element[:publicado] = detail.css(publicado_selector)[0] ? detail.css(publicado_selector)[0].text.squish.gsub('Publicado ','').gsub('.','') : nil
+		element[:visto] = detail.css('.visitas-auto')[0] ? detail.css('.visitas-auto')[0].text.squish.to_i : nil
+		# Obtengo la tabla con detalles, y la recorro buscando los keywords.
+		detail.css('table.tablaauto tr').each do |row|
+			if row.css('td')[0]
+				case row.css('td')[0].text.squish
+				when 'Marca:'
+					element[:marca] = row.css('td')[1] ? row.css('td')[1].text.squish : nil
+				when 'Modelo:'
+					element[:modelo] = row.css('td')[1] ? row.css('td')[1].text.squish : nil
+				when 'Versión:'
+					element[:version] = row.css('td')[1] ? row.css('td')[1].text.squish : nil
+				when 'Año:'
+					element[:ano] = row.css('td')[1] ? row.css('td')[1].text.squish.gsub('_.','').to_i : nil
+				when 'Tipo vehíc:'
+					element[:tipo] = row.css('td')[1] ? row.css('td')[1].text.squish : nil
+				when 'Carrocería:'
+					element[:carroceria] = row.css('td')[1] ? row.css('td')[1].text.squish : nil
+				when 'Color:'
+					element[:color] = row.css('td')[1] ? row.css('td')[1].text.squish : nil
+				when 'Kilometraje:'
+					element[:kilometraje] = row.css('td')[1] ? row.css('td')[1].text.squish.gsub('.','').to_i : nil
+				when 'Cilindrada :'
+					element[:cilindrada] = row.css('td')[1] ? row.css('td')[1].text.squish.gsub(' c.c.','').gsub('.','').to_i : nil
+				when 'Transmisión:'
+					element[:transmision] = row.css('td')[1] ? row.css('td')[1].text.squish : nil
+				when 'Dirección:'
+					element[:direccion] = row.css('td')[1] ? row.css('td')[1].text.squish : nil
+				when 'Aire'
+					element[:aire] = row.css('td')[1] ? row.css('td')[1].text.squish : nil
+				when 'Radio:'
+					element[:radio] = row.css('td')[1] ? row.css('td')[1].text.squish : nil
+				when 'Alzavidrios'
+					element[:alzavidrios] = row.css('td')[1] ? row.css('td')[1].text.squish : nil
+				when 'Espejos'
+					element[:espejos] = row.css('td')[1] ? row.css('td')[1].text.squish : nil
+				when 'Frenos'
+					element[:frenos] = row.css('td')[1] ? row.css('td')[1].text.squish : nil
+				when 'Airbag'
+					element[:airbags] = row.css('td')[1] ? row.css('td')[1].text.squish : nil
+				when 'Cierre'
+					element[:cierre] = row.css('td')[1] ? row.css('td')[1].text.squish : nil
+				when 'Catalítico'
+					element[:catalitico] = row.css('td')[1] ? row.css('td')[1].text.squish : nil
+				when 'Combustible'
+					element[:combustible] = row.css('td')[1] ? row.css('td')[1].text.squish : nil
+				when '4WD'
+					element[:traccion] = row.css('td')[1] ? row.css('td')[1].text.squish : nil
+				when 'Llantas'
+					element[:llantas] = row.css('td')[1] ? row.css('td')[1].text.squish : nil
+				when 'Puertas:'
+					element[:puertas] = row.css('td')[1] ? row.css('td')[1].text.squish.to_i : nil
+				when 'Alarma'
+					element[:alarma] = row.css('td')[1] ? row.css('td')[1].text.squish : nil
+				when 'Techo'
+					element[:techo] = row.css('td')[1] ? row.css('td')[1].text.squish : nil
+				when 'Patente:'
+					element[:patente] = row.css('td')[1] ? row.css('td')[1].text.squish : nil
+				end
+			end
 		end
-		result = Array.new
-		error_obj = Array.new
-		a = Mechanize.new
-		a.set_proxy('127.0.0.1', 8118)
-		a.get('http://www2.chileautos.cl/chileautos.asp') do |page|
-			search_result = page.form_with(:name => 'form_vehiculos') do |form|
-				model_field = form.field_with(:name => 'modelo')
-				model_field.value = search
-				ai_field = form.field_with(:name => 'ai')
-				ai_field.value = 2012
-				af_field = form.field_with(:name => 'af')
-				af_field.value = 2016
-				dea_field = form.field_with(:name => 'dea')
-				dea_field.value = 100
-				button = form.button
-			end.submit
-		end
-		body = Nokogiri::HTML(search_result.body)
-		if body.any?
-			render :json => { :status => true, :message => "Results.", :body => body }, :status => 200
-		else
-			render :json => { :status => true, :message => "There was a problem retrieving the information." }, :status => 200
-		end
+		return element
 	end
+
 end
