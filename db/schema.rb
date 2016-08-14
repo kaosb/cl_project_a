@@ -13,7 +13,7 @@
 ActiveRecord::Schema.define(version: 20160814055938) do
 
   create_table "cars", force: :cascade do |t|
-    t.integer  "site_id",                    null: false
+    t.integer  "site_id"
     t.string   "imagen"
     t.string   "link"
     t.string   "titulo"
@@ -29,6 +29,9 @@ ActiveRecord::Schema.define(version: 20160814055938) do
     t.string   "carroceria"
     t.string   "color"
     t.integer  "kilometraje"
+    t.integer  "cilindrada"
+    t.string   "transmision"
+    t.string   "direccion"
     t.string   "aire"
     t.string   "radio"
     t.string   "alzavidrios"
@@ -38,13 +41,21 @@ ActiveRecord::Schema.define(version: 20160814055938) do
     t.string   "cierre"
     t.string   "catalitico"
     t.string   "combustible"
+    t.string   "traccion"
     t.string   "llantas"
     t.integer  "puertas"
     t.string   "alarma"
+    t.string   "techo"
     t.string   "patente"
     t.datetime "created_at",                 null: false
     t.datetime "updated_at",                 null: false
     t.boolean  "status",      default: true
+  end
+
+  create_table "sqlite_stat1", id: false, force: :cascade do |t|
+    t. "tbl"
+    t. "idx"
+    t. "stat"
   end
 
 end

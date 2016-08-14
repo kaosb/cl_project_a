@@ -9,10 +9,28 @@ class CrawlerController < ApplicationController
 		search = params[:search].nil? ? 'cerato' : params[:search].to_s
 		result = chileautos_crawler(search)
 		if result.any?
-			render :json => { :status => true, :message => "Search Results.", :result => result }, :status => 200
+			render :json => { :status => true, :message => "Search results.", :result => result }, :status => 200
 		else
 			render :json => { :status => true, :message => "There was a problem retrieving the information." }, :status => 200
 		end
+	end
+
+	def chileautos_persistent
+		search = params[:search].nil? ? 'cerato' : params[:search].to_s
+		# result = Car.all
+		result = Car.where("titulo LIKE ?", "%#{search}%")
+		if result.any?
+			render :json => { :status => true, :message => "Search persistent results.", :result => result }, :status => 200
+		else
+			render :json => { :status => true, :message => "No results." }, :status => 200
+		end
+	end
+
+	def chileautos_persistent_result(result)
+		result.each do |obj|
+			qresult = Car.where(site_id: obj[:site_id]).first || Car.create(obj)
+		end
+		return result
 	end
 
 	def chileautos_crawler(search)
@@ -114,8 +132,8 @@ class CrawlerController < ApplicationController
 					element[:modelo] = row.css('td')[1] ? row.css('td')[1].text.squish : nil
 				when 'Versión:'
 					element[:version] = row.css('td')[1] ? row.css('td')[1].text.squish : nil
-				when 'Año:'
-					element[:ano] = row.css('td')[1] ? row.css('td')[1].text.squish.gsub('_.','').to_i : nil
+				# when 'Año:'
+				# 	element[:ano] = row.css('td')[1] ? row.css('td')[1].text.squish.gsub('_.','').to_i : nil
 				when 'Tipo vehíc:'
 					element[:tipo] = row.css('td')[1] ? row.css('td')[1].text.squish : nil
 				when 'Carrocería:'
@@ -162,6 +180,9 @@ class CrawlerController < ApplicationController
 					element[:patente] = row.css('td')[1] ? row.css('td')[1].text.squish : nil
 				end
 			end
+		end
+		if !Car.where(site_id: element[:site_id]).first
+			Car.create(element)
 		end
 		return element
 	end

@@ -1,37 +1,42 @@
 class CreateCars < ActiveRecord::Migration[5.0]
 	def change
 		create_table :cars do |t|
-			t.integer :site_id, null: false
-			t.string :imagen, null: true
-			t.string :link, null: true
-			t.string :titulo, null: true
-			t.integer :ano, null: true
-			t.integer :precio, null: true
-			t.string :vendedor, null: true
-			t.string :publicado, null: true
-			t.integer :visto, null: true
-			t.string :marca, null: true
-			t.string :modelo, null: true
-			t.string :version, null: true
-			t.string :tipo, null: true
-			t.string :carroceria, null: true
-			t.string :color, null: true
-			t.integer :kilometraje, null: true
-			t.string :aire, null: true
-			t.string :radio, null: true
-			t.string :alzavidrios, null: true
-			t.string :espejos, null: true
-			t.string :frenos, null: true
-			t.string :airbags, null: true
-			t.string :cierre, null: true
-			t.string :catalitico, null: true
-			t.string :combustible, null: true
-			t.string :llantas, null: true
-			t.integer :puertas, null: true
-			t.string :alarma, null: true
-			t.string :patente, null: true
+			t.integer :site_id
+			t.string :imagen
+			t.string :link
+			t.string :titulo
+			t.integer :ano
+			t.integer :precio
+			t.string :vendedor
+			t.string :publicado
+			t.integer :visto
+			t.string :marca
+			t.string :modelo
+			t.string :version
+			t.string :tipo
+			t.string :carroceria
+			t.string :color
+			t.integer :kilometraje
+			t.integer :cilindrada
+			t.string :transmision
+			t.string :direccion
+			t.string :aire
+			t.string :radio
+			t.string :alzavidrios
+			t.string :espejos
+			t.string :frenos
+			t.string :airbags
+			t.string :cierre
+			t.string :catalitico
+			t.string :combustible
+			t.string :traccion
+			t.string :llantas
+			t.integer :puertas
+			t.string :alarma
+			t.string :techo
+			t.string :patente
 			t.timestamps
-			t.boolean :status, default: 1, null: true
+			t.boolean :status, default: 1
 		end
 	end
 end
