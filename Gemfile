@@ -51,5 +51,6 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 gem 'mechanize'
 gem 'net-telnet'
 gem 'tor-privoxy', :git => 'git@github.com:pirj/tor-privoxy.git'
-gem 'adminlte-rails'
-gem 'will_paginate', '>= 3.1'
+gem 'whenever', :require => false
+# gem 'adminlte-rails'
+# gem 'will_paginate', '>= 3.1'
