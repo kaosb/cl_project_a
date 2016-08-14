@@ -167,7 +167,7 @@ class Car < ApplicationRecord
 					after: element[:precio]
 					})
 			end
-			if car[:visto] != element[:visto]
+			if (car[:visto] != element[:visto]) && (element[:visto] >= car[:visto]+5)
 				CarHistoryTrack.create({
 					car_id: car[:id],
 					slug: "visto",
