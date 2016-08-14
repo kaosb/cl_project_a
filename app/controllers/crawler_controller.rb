@@ -7,7 +7,12 @@ class CrawlerController < ApplicationController
 	def chileautos
 		# Verifico Parametros.
 		search = params[:search].nil? ? 'cerato' : params[:search].to_s
-		chileautos_crawler(search)
+		result = chileautos_crawler(search)
+		if result.any?
+			render :json => { :status => true, :message => "Search Results.", :result => result }, :status => 200
+		else
+			render :json => { :status => true, :message => "There was a problem retrieving the information." }, :status => 200
+		end
 	end
 
 	def chileautos_crawler(search)
@@ -92,11 +97,7 @@ class CrawlerController < ApplicationController
 				end
 			end
 		end
-		if result.any?
-			render :json => { :status => true, :message => "Search Results.", :result => result }, :status => 200
-		else
-			render :json => { :status => true, :message => "There was a problem retrieving the information." }, :status => 200
-		end
+		return result
 	end
 
 	def chileautos_detail_scraper(url, element)
