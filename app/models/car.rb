@@ -1,5 +1,7 @@
 class Car < ApplicationRecord
 
+	has_many :car_history_track
+
 	def self.chileautos_persistent_result(result)
 		result.each do |obj|
 			qresult = Car.where(site_id: obj[:site_id]).first || Car.create(obj)
@@ -155,7 +157,26 @@ class Car < ApplicationRecord
 				end
 			end
 		end
-		if !Car.where(site_id: element[:site_id]).first
+		# Almaceno el registro y/o actualizo el objeto.
+		if car = Car.where(site_id: element[:site_id]).first
+			if car[:precio] != element[:precio]
+				CarHistoryTrack.create({
+					car_id: car[:id],
+					slug: "precio",
+					before: car[:precio],
+					after: element[:precio]
+					})
+			end
+			if car[:visto] != element[:visto]
+				CarHistoryTrack.create({
+					car_id: car[:id],
+					slug: "visto",
+					before: car[:visto],
+					after: element[:visto]
+					})
+			end
+			car.update(element)
+		else
 			Car.create(element)
 		end
 		return element
