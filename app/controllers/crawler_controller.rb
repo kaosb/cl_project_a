@@ -18,13 +18,10 @@ class CrawlerController < ApplicationController
 	def chileautos_crawler(search)
 		require 'mechanize'
 		require 'nokogiri'
-		require 'open-uri'
 		# Declaro los array que almacenaran el resultado.
 		result = Array.new
 		# Inicializo Mechanize que se encargara de consumir el formulario de busqueda.
-		a = Mechanize.new
-		a.set_proxy('127.0.0.1', 8118)
-		# a = TorPrivoxy::Agent.new '127.0.0.1', 'zz359G*wNDHxnT8#GwPmFHs@4', 8118 => 8051
+		a = TorPrivoxy::Agent.new '127.0.0.1', 'zz359G*wNDHxnT8#GwPmFHs@4', 8118 => 8051
 		a.get('http://www2.chileautos.cl/chileautos.asp') do |page|
 			# Seteo el formulario y lo ejecuto.
 			search_result = page.form_with(:name => 'form_vehiculos') do |form|
@@ -69,7 +66,8 @@ class CrawlerController < ApplicationController
 			## Reviso las otras paginas
 			body.css('.nav').each do |link|
 				url = 'http:' + link['href']
-				document = Nokogiri::HTML(open(url, :proxy => "http://127.0.0.1:8118"))
+				b = TorPrivoxy::Agent.new '127.0.0.1', 'zz359G*wNDHxnT8#GwPmFHs@4', 8118 => 8051
+				document = Nokogiri::HTML(b.get(url).body)
 				document.css('.tbl_Principal').css('tr')[1..-1].each do |tr|
 					begin
 						link = 'http:' + (tr.css('td')[1].css('a')[0]['href'] ? tr.css('td')[1].css('a')[0]['href'] : nil)
@@ -101,7 +99,8 @@ class CrawlerController < ApplicationController
 	end
 
 	def chileautos_detail_scraper(url, element)
-		detail = Nokogiri::HTML(open(url, :proxy => "http://127.0.0.1:8118"))
+		c = TorPrivoxy::Agent.new '127.0.0.1', 'zz359G*wNDHxnT8#GwPmFHs@4', 8118 => 8051
+		detail = Nokogiri::HTML(c.get(url).body)
 		# Obtengo datos del dom y inicializo el objeto con la informacion preliminar.
 		publicado_selector = 'body > div:nth-child(6) > div:nth-child(2) > div:nth-child(2) > div:nth-child(1) > div:nth-child(2)'
 		element[:publicado] = detail.css(publicado_selector)[0] ? detail.css(publicado_selector)[0].text.squish.gsub('Publicado ','').gsub('.','') : nil
