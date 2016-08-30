@@ -22,8 +22,9 @@
 env :PATH, ENV['PATH']
 env :GEM_PATH, ENV['GEM_PATH']
 
-every 1.minute do
-	runner "Car.alerta()"
+every 5.minute do
+	runner "Car.chileautos_crawler('terrano')"
+	# runner "Car.alerta()"
 end
 
 every 1.day, :at => '2:30 am' do
