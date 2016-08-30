@@ -1,7 +1,7 @@
 env :PATH, '/home/deploy/.gem/ruby/2.3.0'
 env :GEM_PATH, '/home/deploy/.rbenv/versions/2.3.1/lib/ruby/gems/2.3.0'
 
-every 10.minute do
+every 10.minutes do
 	runner Car.alerta()
 end
 
