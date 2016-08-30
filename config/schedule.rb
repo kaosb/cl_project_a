@@ -19,6 +19,9 @@
 
 # Learn more: http://github.com/javan/whenever
 
+every 1.minute do
+	runner "Car.alerta()"
+end
 
 every 1.day, :at => '2:30 am' do
 	runner "Car.chileautos_crawler('terrano')"
