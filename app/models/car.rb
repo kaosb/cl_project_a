@@ -184,7 +184,7 @@ class Car < ApplicationRecord
 
 	def self.alerta()
 		self.send_email(
-			'Kylwx06upFl71H1HUizYGg', 
+			'E9BJLBNONNw6MoCE95acFg', 
 			'Alerta scrapper',
 			'kaosb',
 			'no-reply@coddea.com',
