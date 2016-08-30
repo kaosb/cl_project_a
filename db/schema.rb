@@ -12,7 +12,7 @@
 
 ActiveRecord::Schema.define(version: 20160814204820) do
 
-  create_table "car_history_tracks", force: :cascade do |t|
+  create_table "car_history_tracks", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin" do |t|
     t.integer  "car_id",                    null: false
     t.string   "slug"
     t.string   "before"
@@ -22,7 +22,7 @@ ActiveRecord::Schema.define(version: 20160814204820) do
     t.boolean  "status",     default: true
   end
 
-  create_table "cars", force: :cascade do |t|
+  create_table "cars", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin" do |t|
     t.integer  "site_id"
     t.string   "imagen"
     t.string   "link"
@@ -60,12 +60,6 @@ ActiveRecord::Schema.define(version: 20160814204820) do
     t.datetime "created_at",                 null: false
     t.datetime "updated_at",                 null: false
     t.boolean  "status",      default: true
-  end
-
-  create_table "sqlite_stat1", id: false, force: :cascade do |t|
-    t. "tbl"
-    t. "idx"
-    t. "stat"
   end
 
 end
