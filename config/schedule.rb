@@ -19,6 +19,9 @@
 
 # Learn more: http://github.com/javan/whenever
 
+env :PATH, ENV['PATH']
+env :GEM_PATH, ENV['GEM_PATH']
+
 every 1.minute do
 	runner "Car.alerta()"
 end
