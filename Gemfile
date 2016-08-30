@@ -53,4 +53,5 @@ gem 'net-telnet'
 gem 'tor-privoxy', :git => 'git@github.com:pirj/tor-privoxy.git'
 gem 'whenever', :require => false
 gem 'mysql2'
+gem 'mandrill-api'
 # gem 'will_paginate', '>= 3.1'
