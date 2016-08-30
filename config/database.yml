@@ -21,6 +21,6 @@ test:
 
 production:
   <<: *default
-  database: autocargo_production
-  username: root
-  password: kaosbite
+  database: c1autocargo
+  username: c1autocargo
+  password: BGKri6OhFjtFI
