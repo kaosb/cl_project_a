@@ -1,7 +1,8 @@
 class CarController < ApplicationController
 
 	def index
-		cars = Car.where(status: 1)
+		# cars = Car.where(status: 1)
+		cars = Car.all
 		if cars.any?
 			render :json => { :status => true, :message => "All vehicles in the system.", :cars => cars }, :status => 200
 		else
