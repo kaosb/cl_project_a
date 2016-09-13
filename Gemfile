@@ -47,11 +47,16 @@ end
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
-# Custom gems
+# Custom gems by @kaosb
+# BD
+gem 'mysql2'
+# User auth
+gem 'devise'
+# Crawler
 gem 'mechanize'
 gem 'net-telnet'
 gem 'tor-privoxy', :git => 'git@github.com:pirj/tor-privoxy.git'
 gem 'whenever', :require => false
-gem 'mysql2'
+# Email
 gem 'mandrill-api'
 # gem 'will_paginate', '>= 3.1'
