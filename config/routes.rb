@@ -1,5 +1,9 @@
 Rails.application.routes.draw do
 
+  get 'reports/index'
+
+  get 'reports/dashboard'
+
   devise_for :users
 	root to: "crawler#welcome"
 
