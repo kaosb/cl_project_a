@@ -1,4 +1,6 @@
 class CarController < ApplicationController
+	
+	skip_before_filter :authenticate_user!
 
 	def index
 		# cars = Car.where(status: 1)
