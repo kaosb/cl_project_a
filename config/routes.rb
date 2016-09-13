@@ -1,12 +1,13 @@
 Rails.application.routes.draw do
 
-  get 'reports/index'
+	devise_for :users
+	# root to: "crawler#welcome"
+	root to: "reports#index"
 
-  get 'reports/dashboard'
+	get 'reports/index'
+	get 'reports/dashboard'
 
-  devise_for :users
-	root to: "crawler#welcome"
-
+	# API
 	scope '/api' do
 		scope '/v1' do
 			# Crawler
