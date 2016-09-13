@@ -19,6 +19,8 @@ Rails.application.routes.draw do
 				get '/' => 'car#index'
 				get '/:car_id' => 'car#show'
 				get	'/search/:search' => 'car#search'
+				get	'/search/:search/:from' => 'car#search'
+				get	'/search/:search/:from/:to' => 'car#search'
 			end
 		end
 	end
